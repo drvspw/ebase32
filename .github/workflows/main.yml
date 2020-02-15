@@ -1,0 +1,52 @@
+name: ebase32 build
+
+on: [push]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    container:
+      image: erlang:22.2.3
+
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: Build and Test
+      run: make test
+
+  release:
+    needs: build
+
+    runs-on: ubuntu-latest
+
+    if: endsWith(github.ref, 'refs/heads/master')
+
+    steps:
+    - name: Set up Go 1.13
+      uses: actions/setup-go@v1
+      with:
+        go-version: 1.13
+      id: go
+
+    - name: Checkout
+      uses: actions/checkout@v1
+
+    - name: Push Tag
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+
+      run: |
+        go get -u github.com/tcnksm/ghr
+        VERSION=$(./ebump current)
+        REPO=ebase32
+        OWNER=drvspw
+        $HOME/go/bin/ghr \
+            -t ${GITHUB_TOKEN} \
+            -u ${OWNER} \
+            -r ${REPO} \
+            -c ${GITHUB_SHA} \
+            -delete \
+            ${VERSION} ./README.md

@@ -1,0 +1,14 @@
+{application, ebase32,
+ [{description, "Base32 encoding OTP library"},
+  {vsn, {cmd, "./ebump current"}},
+  {registered, []},
+  {applications,
+   [kernel,
+    stdlib
+   ]},
+  {env,[]},
+  {modules, []},
+
+  {licenses, ["Apache 2.0"]},
+  {links, []}
+ ]}.
